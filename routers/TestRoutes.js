@@ -11,14 +11,4 @@ router.get('/get-testbyslug', verifyToken, TestController.GetTestBySlugTeacher);
 
 router.get('/test-by-student', verifyToken, TestController.GetTestBySlugByStudent);
 
-router.post("/add-question-with-questionbank", verifyToken, TestController.AddQuestionWithQuestionBank)
-
-router.put('/public-test', verifyToken, TestController.PublicTest)
-
-router.put('/close-test', verifyToken, TestController.CloseTest)
-
-router.post("/create-question-with-questionbank", verifyToken, TestController.CreateQuestionWithQuestionBank)
-
-
-
 module.exports = router;

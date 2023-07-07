@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const { COLLECTION } = require('../utils/enum');
 
 const CommentSchema = new Schema({
-    createdUser: {
+    creator: {
         type: Schema.Types.ObjectId,
         ref: COLLECTION.USER,
         required: true

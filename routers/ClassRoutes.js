@@ -9,7 +9,10 @@ router.post('/add', verifyToken, ClassController.AddClass);
 
 // GET ALL CLASSES
 router.get('/', verifyToken, ClassController.GetAllClasses);
+router.get('/all-member', verifyToken, ClassController.GetAllMember);
 router.get('/by-user-id', verifyToken, ClassController.GetClassByUserId);
+router.post("/join", verifyToken, ClassController.JoinClass)
+router.post("/leave", verifyToken, ClassController.LeaveClass)
 // GET CLASS BY ID
 router.get('/:id', verifyToken, ClassController.GetClassById);
 
@@ -20,7 +23,9 @@ router.get('/teacher/:id', verifyToken, ClassController.GetClassByTeacherId);
 router.put('/:id', verifyToken, ClassController.UpdateClassById);
 
 // DELETE CLASS BY ID
-router.delete('/:id', verifyToken, ClassController.DeleteClassById);
+//router.delete('/:id', verifyToken, ClassController.DeleteClassById);
+
+router.delete("/remove-student", verifyToken, ClassController.RemoveStudent)
 
 
 

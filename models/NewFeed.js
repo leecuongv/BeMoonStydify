@@ -17,7 +17,7 @@ const NewFeedSchema = new Schema({
         type: String,
         default: ''
     },
-    teacherId: {
+    creator: {
         type: Schema.Types.ObjectId,
         ref: COLLECTION.USER,
         required: true,
