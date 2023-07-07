@@ -144,23 +144,48 @@ const ClassController = {
     // GET CLASS BY ID
     GetClassById: async (req, res) => {
         try {
+            const username = req.user?.sub
+            const { id } = req.params
+            const loginUser = await User.findOne({ username })
+            if (!loginUser)
+                return res.status(400).json({ message: "Không có người dùng!" })
+            let loginUserId = loginUser.id
 
+            let joinedClass = await Class.findById(id)
+
+            return res.status(200).json({
+                joinedClass
+            })
         } catch (error) {
-
+            console.log(error)
+            return res.status(400).json({
+                message: "Lấy thông tin khóa học thất bại!"
+            })
         }
     },
 
     // GET CLASS BY TEACHER ID
     GetClassByTeacherId: async (req, res) => {
-        Class.find({ teacherId: req.params.id })
-            .then((data) => res.json({
-                success: true,
-                data: data,
-            }))
-            .catch((err) => res.status(500).json({
-                success: false,
-                message: err,
-            }));
+        try {
+            const username = req.user?.sub
+            const loginUser = await User.findOne({ username })
+            if (!loginUser)
+                return res.status(400).json({ message: "Không có người dùng!" })
+            let loginUserId = loginUser.id
+
+            let joinedClass = await Class.find({ teacher: mongoose.Types.ObjectId(loginUserId) })
+
+            return res.status(200).json({
+                joinedClass
+            })
+        } catch (error) {
+            console.log(error)
+            return res.status(400).json({
+                message: "Lấy thông tin khóa học thất bại!"
+            })
+        }
+
+
     },
 
     // ADD CLASS

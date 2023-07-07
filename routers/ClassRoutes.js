@@ -14,13 +14,13 @@ router.get('/by-user-id', verifyToken, ClassController.GetClassByUserId);
 router.post("/join", verifyToken, ClassController.JoinClass)
 router.post("/leave", verifyToken, ClassController.LeaveClass)
 // GET CLASS BY ID
-router.get('/:id', verifyToken, ClassController.GetClassById);
+router.get('/', verifyToken, ClassController.GetClassById);
 
 // GET CLASS BY TEACHER ID
-router.get('/teacher/:id', verifyToken, ClassController.GetClassByTeacherId);
+router.get('/teacher', verifyToken, ClassController.GetClassByTeacherId);
 
 // UPDATE CLASS BY ID
-router.put('/:id', verifyToken, ClassController.UpdateClassById);
+router.put('/', verifyToken, ClassController.UpdateClassById);
 
 // DELETE CLASS BY ID
 //router.delete('/:id', verifyToken, ClassController.DeleteClassById);
