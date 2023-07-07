@@ -4,11 +4,15 @@ const { TakeTestController } = require('../controllers/TakeTestController');
 const TakeTest = require("../models/TakeTest");
 const router = express.Router();
 
-router.post('/take-test', verifyToken, TakeTestController.CreateTakeTest);
+router.post('/', verifyToken, TakeTestController.CreateTakeTest);
+
 router.post('/check-test', verifyToken, TakeTestController.CheckTest);
+
 router.post('/submit-test', verifyToken, TakeTestController.SubmitAnswerSheet);//
-router.get('/get-preview-test', verifyToken, TakeTestController.GetPreviewTest);
-router.get('/get-result-taketest', verifyToken, TakeTestController.GetResultTakeTest)
+
+router.get('/preview-test', verifyToken, TakeTestController.GetPreviewTest);
+
+router.get('/result-take-test', verifyToken, TakeTestController.GetResultTakeTest)
 router.post("/create-log", verifyToken, TakeTestController.CreateLogs)//
 router.get("/get-logs", verifyToken, TakeTestController.GetLogs)
 router.get("/all-take-test", verifyToken, TakeTestController.GetAllTakeTest)

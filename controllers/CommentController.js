@@ -6,28 +6,48 @@ const User = require("../models/User")
 // GET ALL COMMENTS
 const CommentController = {
     GetAllComments: async (req, res) => {
-        Comment.find()
-            .then((data) => res.json({
-                success: true,
-                data: data,
-            }))
-            .catch((err) => res.status(500).json({
-                success: false,
-                message: err,
-            }));
+        try {
+            const username = req.user?.sub
+
+            const user = await User.findOne({ username })
+            if (!user) {
+                return res.status(400).json({ message: "Tài khoản không tồn tại!" })
+            }
+            const comment = await Comment.find()
+            if (!comment)
+                return res.status(400).json({ message: "Không tồn tại bình luận!" })
+
+            return res.status(200).json(comment)
+
+        } catch (error) {
+            console.log(error)
+            return res.status(400).json({
+                message: "Lỗi bình luận!"
+            })
+        }
     },
 
     // GET COMMENT BY ID
     GetCommentById: async (req, res) => {
-        Comment.findById(req.params.id)
-            .then((data) => res.json({
-                success: true,
-                data: data,
-            }))
-            .catch((err) => res.status(500).json({
-                success: false,
-                message: err,
-            }));
+        try {
+            const username = req.user?.sub
+            const { commentId } = req.query
+            const user = await User.findOne({ username })
+            if (!user) {
+                return res.status(400).json({ message: "Tài khoản không tồn tại!" })
+            }
+            const comment = await Comment.findOne({ _id: mongoose.Types.ObjectId(commentId), creator: user.id })
+            if (!comment)
+                return res.status(400).json({ message: "Không tồn tại bình luận!" })
+
+            return res.status(200).json(comment)
+
+        } catch (error) {
+            console.log(error)
+            return res.status(400).json({
+                message: "Lỗi bình luận!"
+            })
+        }
     },
 
     // ADD COMMENT
@@ -45,25 +65,25 @@ const CommentController = {
                 return res.status(400).json({ message: "Bài viết không tồn tại!" })
             const comment = await new Comment({
                 content,
-                creator
+                creator: user.id
             })
             let error = comment.validateSync()
             if (error)
                 return res.status(400).json({ message: "Lỗi tạo bình luận!" })
+            comment.save()
             newFeed.comments.push(comment.id)
             await newFeed.save()
-            let newComment = await Comment.findById(comment.id).populate("creator")
-            newComment = newComment.modifiedPaths(item => {
-                return {
-                    creator: item.creator.fullname,
-                    creatorAVT: item.creator.avatar,
+            const newComment = await Comment.findById(comment.id).populate("creator")
+            console.log(comment)
+            let data = {
+                creator: newComment.creator.fullname,
+                avatar: newComment.creator.avatar,
 
-                    createAt: item.createdAt,
-                    content: item.content
+                createdAt: newComment.createdAt,
+                content: newComment.content
 
-                }
-            })
-            return res.status(200).json(newComment)
+            }
+            return res.status(200).json(data)
 
         } catch (error) {
             console.log(error)
@@ -75,7 +95,7 @@ const CommentController = {
     },
 
     // UPDATE COMMENT BY ID
-    UpdateCommentById: async (req, res) => {
+    UpdateComment: async (req, res) => {
         try {
             const username = req.user?.sub
             const { content, newFeedId, commentId } = req.body
@@ -93,17 +113,17 @@ const CommentController = {
 
 
             let newComment = await Comment.findByIdAndUpdate(existComment.id, { content }, { new: true }).populate("creator")
-            newComment = newComment.modifiedPaths(item => {
-                return {
-                    creator: item.creator.fullname,
-                    creatorAVT: item.creator.avatar,
 
-                    createAt: item.createdAt,
-                    content: item.content
+            data = {
+                creator: newComment.creator.fullname,
+                avatar: newComment.creator.avatar,
 
-                }
-            })
-            return res.status(200).json(newComment)
+                createAt: newComment.createdAt,
+                content: newComment.content
+
+            }
+
+            return res.status(200).json(data)
 
         } catch (error) {
             console.log(error)
@@ -118,13 +138,13 @@ const CommentController = {
         try {
 
             const username = req.user?.sub
-            const { commentId } = req.body
+            const { commentId } = req.query
 
             const user = await User.findOne({ username })
             if (!user) {
                 return res.status(400).json({ message: "Tài khoản không tồn tại!" })
             }
-            const existComment = Comment.findOne({ _id: mongoose.Types.ObjectId(commentId), creator: user.id })
+            const existComment = await Comment.findOne({ _id: mongoose.Types.ObjectId(commentId), creator: user.id })
             if (!existComment)
                 return res.status(400).json({ message: "Bình luận không tồn tại!" })
             const newFeed = await NewFeed.findOne({ comments: { $in: [existComment.id] } })
@@ -149,7 +169,7 @@ const CommentController = {
             if (!user) {
                 return res.status(400).json({ message: "Tài khoản không tồn tại!" })
             }
-            const existComment = Comment.findOne({ _id: mongoose.Types.ObjectId(commentId) })
+            const existComment = await Comment.findOne({ _id: mongoose.Types.ObjectId(commentId) })
             if (!existComment)
                 return res.status(400).json({ message: "Bình luận không tồn tại!" })
             const newFeed = await NewFeed.findOne({ comments: { $in: [existComment.id] } })

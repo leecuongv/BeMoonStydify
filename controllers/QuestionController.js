@@ -56,10 +56,9 @@ const QuestionController = {
             test.maxPoints = Number(test.maxPoints) + Number(newQuestion.maxPoints)
             test.numberofQuestions += 1
             await test.save()
-            return res.status(200).json({
-                message: "Tạo câu hỏi mới thành công!",
-                question: newQuestion
-            })
+            return res.status(200).json(
+                newQuestion
+            )
 
         } catch (error) {
             console.log(error)
@@ -119,103 +118,8 @@ const QuestionController = {
             res.status(400).json({ message: "Lỗi xóa câu hỏi!" })
         }
     },
-    DeleteQuestionInQuestionBank: async (req, res) => {
-        try {
-            const username = req.user?.sub
-            const { questionBankId, questionId } = req.body
-            //if (!username) return res.status(400).json({ message: "Không có người dùng!" })
-            const user = await User.findOne({ username })
-            if (!user) return res.status(400).json({ message: "Không có người dùng!" })
-            const questionBank = await QuestionBank.findOne({ _id: mongoose.Types.ObjectId(questionBankId), creatorId: user._id })
-            if (!questionBank) return res.status(400).json({ message: "Không tồn tại!" })
 
-            const question = await Question.findOne({ _id: mongoose.Types.ObjectId(questionId) })
-            if (!question) return res.status(400).json({ message: 'Không tồn tại câu hỏi' })
-
-            questionBank.questions = questionBank.questions
-                .filter(item => item.toString() !== question.id.toString())
-
-            await questionBank.save()
-            let listTest = await Test.find({
-                'questions.question': { '$in': [question.id] }
-            })
-            if (listTest.length === 0) {
-                //nếu không thuộc QB và Test khác thì xoá câu hỏi trên db
-                await question.deleteOne()
-            }
-
-            return res.status(200).json({
-                message: "Xoá câu hỏi thành công!"
-            })
-
-        } catch (error) {
-            console.log(error)
-            res.status(400).json({ message: "Lỗi xóa câu hỏi!" })
-        }
-    },
-    CreateQuestionByFile: async (req, res) => {
-        try {
-            let start = new Date()
-            const username = req.user?.sub
-            let { testId, questions } = req.body
-            if (!username) return res.status(400).json({ message: "Không có người dùng!" })
-            const user = await User.findOne({ username })
-            const test = await Test.findOne({ _id: mongoose.Types.ObjectId(testId), creatorId: user._id })
-            if (!test) return res.status(400).json({ message: "Không tồn tại!" })
-            if (!user) return res.status(400).json({ message: "Không có người dùng!" })
-
-            questions = questions.map(async (question) => {
-                const newQuestion = new Question({
-
-                    type: question.type,
-                    content: question.content,
-                    maxPoints: question.maxPoints,
-                    answers: [],
-                    image: question.image
-                })
-                let error = newQuestion.validateSync()
-                if (error) {
-                    console.log(error)
-                    return res.status(400).json({
-                        message: "Tạo câu hỏi thất bại!"
-                    })
-                }
-
-                await Promise.all(question.answers.map(async (element) => {
-                    const answer = new Answer({
-                        content: element.content || "",
-                        isCorrect: element.isCorrect || false
-                    })
-                    newQuestion.answers.push(answer.id)
-                    answer.save()
-                }))
-
-                test.maxPoints = Number(test.maxPoints) + Number(newQuestion.maxPoints)
-                test.numberofQuestions += 1
-                test.questions.push({
-                    index: test.questions.length + 1,
-                    question: newQuestion.id
-                })
-
-                return newQuestion.save()
-
-            });
-            questions = await Promise.all(questions)
-            await test.save()
-            new Date().getTime() - start.getTime()
-            return res.status(200).json({
-                message: "Tạo câu hỏi mới thành công!",
-                questions
-
-            })
-
-        } catch (error) {
-            console.log(error)
-            res.status(400).json({ message: "Lỗi tạo câu hỏi!" })
-        }
-    },
-
-    UpdateQuestionInTest: async (req, res) => {
+    UpdateQuestion: async (req, res) => {
         try {
             let start = new Date()
             const username = req.user?.sub
@@ -224,15 +128,8 @@ const QuestionController = {
             const user = await User.findOne({ username })
             if (!user) return res.status(400).json({ message: "Không có người dùng!" })
 
-            // const test = await Test.findOne({ _id: mongoose.Types.ObjectId(testId), creatorId: user._id })
-
-            // if (!test) return res.status(400).json({ message: "Không tồn tại bài thi!" })
-
             const question = await Question.findOne({ _id: mongoose.Types.ObjectId(questionId) })
             if (!question) return res.status(400).json({ message: 'Không tồn tại câu hỏi' })
-
-            // test.maxPoints -= question.maxPoints
-
 
             let newAnswers = []
 
@@ -350,10 +247,10 @@ const QuestionController = {
             await Test.bulkWrite(newTest)
 
             let updatedQuestion = await Question.findByIdAndUpdate({ '_id': new mongoose.Types.ObjectId(question.id) }, newData, { new: true }).populate('answers')
-            return res.status(200).json({
+            return res.status(200).json(
                 updatedQuestion
                 //question: exitsQuestion
-            })
+            )
         } catch (error) {
             console.log(error)
             res.status(400).json({ message: "Lỗi tạo câu hỏi!" })

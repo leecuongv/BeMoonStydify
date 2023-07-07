@@ -5,7 +5,7 @@ const { verifyToken, verifyTokenAdmin } = require("../controllers/middlewareCont
 const router = express.Router();
 
 // ADD CLASS
-router.post('/add', verifyToken, ClassController.AddClass);
+router.post('/', verifyToken, ClassController.AddClass);
 
 // GET ALL CLASSES
 router.get('/', verifyToken, ClassController.GetAllClasses);
@@ -13,20 +13,14 @@ router.get('/all-member', verifyToken, ClassController.GetAllMember);
 router.get('/by-user-id', verifyToken, ClassController.GetClassByUserId);
 router.post("/join", verifyToken, ClassController.JoinClass)
 router.post("/leave", verifyToken, ClassController.LeaveClass)
-// GET CLASS BY ID
+
 router.get('/', verifyToken, ClassController.GetClassById);
 
-// GET CLASS BY TEACHER ID
 router.get('/teacher', verifyToken, ClassController.GetClassByTeacherId);
 
-// UPDATE CLASS BY ID
 router.put('/', verifyToken, ClassController.UpdateClassById);
 
-// DELETE CLASS BY ID
-//router.delete('/:id', verifyToken, ClassController.DeleteClassById);
-
 router.delete("/remove-student", verifyToken, ClassController.RemoveStudent)
-
-
+router.delete("/", verifyToken, ClassController.DeleteClassById)
 
 module.exports = router;

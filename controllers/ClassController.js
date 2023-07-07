@@ -22,24 +22,6 @@ const ClassController = {
                 }
             )
 
-            /*
-            - tên lớp
-- mô tả
-- mã lớp
-- tất cả các newfeed của lớp học
-   + avt người tạo
-   + tên người tạo
-   + thời gian tạo bài đăng
-   + nội dung bài đăng
-   + tất cả các comment của bài đăng
-       * avt người bình luận
-       * tên người bình luận
-       * nội dung bình luận
-       * thời gian bình luận
-
-            */
-
-
             return res.status(200).json(
                 joinedClass
             )
@@ -145,7 +127,7 @@ const ClassController = {
     GetClassById: async (req, res) => {
         try {
             const username = req.user?.sub
-            const { id } = req.params
+            const { id } = req.query
             const loginUser = await User.findOne({ username })
             if (!loginUser)
                 return res.status(400).json({ message: "Không có người dùng!" })
@@ -153,9 +135,9 @@ const ClassController = {
 
             let joinedClass = await Class.findById(id)
 
-            return res.status(200).json({
+            return res.status(200).json(
                 joinedClass
-            })
+            )
         } catch (error) {
             console.log(error)
             return res.status(400).json({
@@ -175,9 +157,9 @@ const ClassController = {
 
             let joinedClass = await Class.find({ teacher: mongoose.Types.ObjectId(loginUserId) })
 
-            return res.status(200).json({
+            return res.status(200).json(
                 joinedClass
-            })
+            )
         } catch (error) {
             console.log(error)
             return res.status(400).json({
@@ -275,19 +257,19 @@ const ClassController = {
             let loginUserId = loginUser.id
             const {
                 classId
-            } = req.body
+            } = req.query
 
             const existClass = await Class.findOne({ _id: mongoose.Types.ObjectId(classId), teacher: loginUser.id })
             if (!existClass)
                 return res.status(400).json({ message: "Không tìm thấy lớp học!" })
 
 
-            let updatedClass = await Class.findByIdAndDelete(existClass.id)
+            await Class.findByIdAndDelete(existClass.id)
 
 
-            return res.status(200).json(
-                updatedClass
-            )
+            return res.status(200).json({
+                message: "Xóa lớp học thành công!"
+            })
 
         } catch (error) {
             console.log(error)
@@ -306,6 +288,9 @@ const ClassController = {
             let joinedClass = await Class.findById(classId)
                 .populate("teacher")
                 .populate('students')
+            if (!joinedClass) {
+                return res.status(400).json({ message: "Không tìm thấy lớp học!" })
+            }
 
             let teacher = {
                 fullname: joinedClass.teacher.fullname,
@@ -361,6 +346,7 @@ const ClassController = {
             res.status(500).json({ message: "Lỗi thêm học viên" })
         }
     },
+
 }
 module.exports = {
     ClassController

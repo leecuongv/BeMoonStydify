@@ -9,6 +9,8 @@ const UploadRoutes = require("./UploadRoutes")
 const AdminRoutes = require("./AdminRoutes")
 const ClassRoutes = require("./ClassRoutes")
 const NewFeedRoutes = require("./NewFeedRoutes")
+const CommentRoutes = require("./CommentRoutes")
+
 module.exports = {
     AuthRoute,
     UserRoute,
@@ -20,6 +22,7 @@ module.exports = {
     UploadRoutes,
     AdminRoutes,
     ClassRoutes,
-    NewFeedRoutes
+    NewFeedRoutes,
+    CommentRoutes
 
 }

@@ -15,7 +15,8 @@ const {
   UploadRoutes,
   AdminRoutes,
   ClassRoutes,
-  NewFeedRoutes
+  NewFeedRoutes,
+  CommentRoutes
 } = require('./routers');
 
 const { notFound, errorHandler } = require("./routers/errorMiddleware");
@@ -124,12 +125,12 @@ app.use('/api/user', UserRoute)
 app.use('/api/social', SocialRoutes)
 app.use('/api/test', TestRoutes)
 app.use("/api/question", QuestionRoutes)
-app.use("/api/taketest", TakeTestRoutes)
-app.use("/api/questionbank", QuestionBankRoutes)
+app.use("/api/take-test", TakeTestRoutes)
 app.use("/api/upload", UploadRoutes)
 app.use("/api/admin", AdminRoutes)
 app.use("/api/new-feed", NewFeedRoutes)
 app.use("/api/class", ClassRoutes)
+app.use("/api/comment", CommentRoutes)
 
 app.use(notFound);
 app.use(errorHandler);

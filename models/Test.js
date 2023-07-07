@@ -13,7 +13,7 @@ const testSchema = mongoose.Schema(
       require: true,
       default: "Đề thi",
     },
-    creatorId: {
+    creator: {
       type: mongoose.Schema.Types.ObjectId,
       default: null,
     },

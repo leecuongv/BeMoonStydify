@@ -40,37 +40,7 @@ const UserController = {
             return res.status(500).json({ message: "Lỗi xác thực" })
         }
     },
-    updateAvatar: async (req, res) => {
-        try {
-            const username = req.user?.sub
-            const user = User.findOne({ username })
 
-            if (!user)
-                return res.status(400).json({ message: "Không tìm thấy tài khoản" })
-            const image = req.files.file //file ảnh
-            if (image) {
-                let data = image.data.toString('base64')
-                data = `data:${image.mimetype};base64,${data}`//chuyển sang data uri
-                const upload = await cloudinary.uploader
-                    .upload(data,
-                        {
-                            folder: "avatar/",
-                            public_id: username
-                        })
-
-                const newUser = await User.findOneAndUpdate({ username }, { avatar: upload.secure_url }, { new: true })
-
-                return res.status(200).json({ avatar: newUser.avatar })
-            }
-            else {
-                return res.status(400).json({ message: "Không có hình ảnh tải lên" })
-            }
-
-        } catch (error) {
-            console.log(error)
-            return res.status(400).json({ message: "Lỗi cập nhật tài khoản" })
-        }
-    },
     resetAvatar: async (req, res) => {
         try {
             const username = req.user?.sub
@@ -135,7 +105,7 @@ const UserController = {
     updatePassword: async (req, res) => {
         try {
             const username = req.user?.sub
-            const { password, newPassword, cfPassword } = req.body
+            const { password, newPassword } = req.body
             const salt = await bcrypt.genSalt(10);
             const hash = await bcrypt.hash(newPassword, salt);
             const data = {

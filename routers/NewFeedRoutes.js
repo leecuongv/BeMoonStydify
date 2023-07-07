@@ -4,10 +4,10 @@ const { verifyToken } = require("../controllers/middlewareController")
 
 const router = express.Router();
 // ADD NEWFEED
-router.post('/add', verifyToken, NewFeedController.AddNewFeed);
+router.post('/', verifyToken, NewFeedController.AddNewFeed);
 
 // GET ALL NEWFEEDS
-router.get('/', verifyToken, NewFeedController.GetAllNewFeeds);
+router.get('/all', verifyToken, NewFeedController.GetAllNewFeeds);
 
 // GET NEWFEED BY ID
 router.get('/', verifyToken, NewFeedController.GetNewFeedById);

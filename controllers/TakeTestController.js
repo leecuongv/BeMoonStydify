@@ -26,13 +26,13 @@ const TakeTestController = {
   CheckTest: async (req, res) => {//
     try {
       const username = req.user?.sub;
-      const { slug } = req.body;
+      const { testId } = req.body;
 
       const user = await User.findOne({ username });
       if (!user)
         return res.status(400).json({ message: "Không có người dùng" });
 
-      let test = await Test.findOne({ slug })
+      let test = await Test.findById(testId)
         .populate({
           path: "questions.question",
           populate: {
@@ -119,7 +119,7 @@ const TakeTestController = {
     try {
       const username = req.user?.sub;
 
-      const { slug, pin } = req.body;
+      const { testId } = req.body;
 
       const toDay = new Date()
       if (!username)
@@ -127,7 +127,7 @@ const TakeTestController = {
       const user = await User.findOne({ username });
       if (!user)
         return res.status(400).json({ message: "Không có người dùng" });
-      const test = await Test.findOne({ slug })
+      const test = await Test.findById(testId)
         .populate({
           path: "questions.question",
           populate: {
@@ -153,21 +153,8 @@ const TakeTestController = {
       let endTime = moment(new Date()).add(maxTimes, "minutes").toDate();
       questions = questions.map((item) => ({ ...item.question._doc, id: item.question._id, index: item.index }));
 
-      if (test.pin !== "") {
-        if (test.pin !== pin)
-          return res.status(400).json({ message: "Sai mật khẩu!" });
-      }
-      //if()
       if (!test) return res.status(400).json({ message: "Không có bài thi!" });
 
-
-
-      // const takeTests = TakeTest.find({})  
-      // const countTakeTest = takeTest.length - 1;
-      // if (countTakeTest > test.attemptsAllowed)
-      //   return res.status(400).json({
-      //     message: "Đã quá số lần làm bài"
-      //   })
       const newTakeTest = new TakeTest({
         testId: test.id,
         userId: user.id,
@@ -228,6 +215,7 @@ const TakeTestController = {
       questions.forEach(question => {
         let pointOfQuestion = 0
         let questionClient = answerSheet.find(e => e.question === question.id.toString())
+        console.log(questionClient)
         if (question.type === QUESTIONTYPE.FILLIN) {
           //thay bằng Question result, answer
           if (questionClient)

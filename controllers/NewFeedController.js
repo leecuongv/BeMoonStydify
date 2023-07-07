@@ -1,5 +1,8 @@
 const { default: mongoose } = require('mongoose');
 const NewFeed = require('../models/NewFeed');
+const User = require('../models/User');
+const Class = require('../models/Class');
+const Comment = require('../models/Comment');
 
 // GET ALL NEW FEEDS
 const NewFeedController = {
@@ -9,12 +12,16 @@ const NewFeedController = {
             const loginUser = await User.findOne({ username })
             if (!loginUser)
                 return res.status(400).json({ message: "Không có người dùng!" })
-            const { newFeedId } = req.query
+
 
             const newNewFeed = await NewFeed.find()
-            return res.status(200).json({
+            if (!newNewFeed) {
+                return res.status(400).json({ message: "Không có bài đăng!" })
+            }
+
+            return res.status(200).json(
                 newNewFeed
-            })
+            )
         } catch (error) {
             return res.status(400).json({ message: "Lỗi lấy thông tin bài đăng!" })
         }
@@ -30,9 +37,12 @@ const NewFeedController = {
             const { newFeedId } = req.query
 
             const newNewFeed = await NewFeed.findById(newFeedId)
-            return res.status(200).json({
+            if (!newNewFeed) {
+                return res.status(400).json({ message: "Không tìm thấy bài đăng!" })
+            }
+            return res.status(200).json(
                 newNewFeed
-            })
+            )
         } catch (error) {
             return res.status(400).json({ message: "Lỗi lấy thông tin bài đăng!" })
         }
@@ -48,8 +58,12 @@ const NewFeedController = {
             const {
                 content,
                 attachmentLink,
-                newFeedUrl } = req.body
-
+                newFeedUrl,
+                classId
+            } = req.body
+            const existClass = await Class.findOne({ _id: mongoose.Types.ObjectId(classId), creator: loginUser.id })
+            if (!existClass)
+                return res.status(400).json({ message: "Không tìm thấy lớp học!" })
             const newNewFeed = await new NewFeed({
                 content,
                 attachmentLink,
@@ -63,10 +77,14 @@ const NewFeedController = {
                 });
             }
             await newNewFeed.save()
-            return res.status(200).json({
+            await existClass.newFeeds.push(newNewFeed._id)
+            existClass.save()
+
+            return res.status(200).json(
                 newNewFeed
-            })
+            )
         } catch (error) {
+            console.log(error)
             return res.status(400).json({ message: "Lỗi tạo bài đăng!" })
         }
 
@@ -96,9 +114,9 @@ const NewFeedController = {
             if (!existNewFeed)
                 return res.status(400).json({ message: "Không tìm thấy bài đăng!" })
             const updateNewFeed = await NewFeed.findByIdAndUpdate(newFeedId, data, { new: true })
-            return res.status(200).json({
+            return res.status(200).json(
                 updateNewFeed
-            })
+            )
         } catch (error) {
             return res.status(400).json({ message: "Lỗi tạo bài đăng!" })
         }
@@ -108,7 +126,7 @@ const NewFeedController = {
     DeleteNewFeedById: async (req, res) => {
         try {
             const username = req.user?.sub
-            const { newFeedId } = req.body
+            const { newFeedId } = req.query
             const teacher = await User.findOne({ username })
 
             if (!teacher) {
@@ -120,7 +138,7 @@ const NewFeedController = {
                 return res.status(400).json({
                     message: "Không tìm thấy khoá học",
                 })
-
+            let course = await Class.findOne({ newFeeds: { $in: [newFeed.id] } })
             if (course.newFeeds.find(item => item.toString() === newFeed.id.toString())) {//nếu chưa có sinh viên trên
                 course.newFeeds = course.newFeeds.filter(item => item.toString() !== newFeed.id.toString())
             }
@@ -135,13 +153,13 @@ const NewFeedController = {
 
         } catch (error) {
             console.log(error)
-            res.status(500).json({ message: "Lỗi thêm bài đăng" })
+            res.status(500).json({ message: "Lỗi xóa bài đăng" })
         }
     },
     RemoveNewFeedByTeacher: async (req, res) => {
         try {
             const username = req.user?.sub
-            const { newFeedId } = req.body
+            const { newFeedId } = req.query
             const teacher = await User.findOne({ username })
 
             if (!teacher) {
@@ -179,7 +197,7 @@ const NewFeedController = {
     RemoveCommentByTeacher: async (req, res) => {
         try {
             const username = req.user?.sub
-            const { commentId } = req.body
+            const { commentId } = req.query
             const teacher = await User.findOne({ username })
 
             if (!teacher) {

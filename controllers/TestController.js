@@ -38,7 +38,7 @@ const TestController = {
                 name,
                 description,
                 pin,
-                teacher: user.id,
+                creator: user.id,
                 numberofQuestions: 0,
                 viewPoint,
                 viewAnswer,
@@ -64,10 +64,9 @@ const TestController = {
             course.tests.push(test.id);
             await course.save()
 
-            return res.status(200).json({
-                message: "Tạo bài thi mới thành công",
-                slug: test._doc.slug
-            })
+            return res.status(200).json(
+                test
+            )
 
         } catch (error) {
             console.log(error)
@@ -81,9 +80,9 @@ const TestController = {
             if (!username) return res.status(400).json({ message: "Không có người dùng" })
             const user = await User.findOne({ username })
             if (!user) return res.status(400).json({ message: "Không có người dùng" })
-            const { id } = req.query
+            const { testId } = req.query
 
-            const test = await Test.findOne({ _id: mongoose.Types.ObjectId(id), teacher: user.id })
+            const test = await Test.findOne({ _id: mongoose.Types.ObjectId(testId), teacher: user.id })
                 .populate({
                     path: 'questions.question',
                     populate: {
@@ -109,9 +108,9 @@ const TestController = {
             if (!username) return res.status(400).json({ message: "Không có người dùng" })
             const user = await User.findOne({ username })
             if (!user) return res.status(400).json({ message: "Không có người dùng" })
-            const { id } = req.query
+            const { testId } = req.query
 
-            const test = await Test.findById(id)
+            const test = await Test.findById(testId)
                 .populate({
                     path: 'questions.question',
                     populate: {
@@ -139,13 +138,17 @@ const TestController = {
     UpdateTest: async (req, res) => {
         try {
             const username = req.user?.sub
-            const { id, name, description, pin, classId, numberofQuestions, viewPoint, viewAnswer,
+            const { testId, name, description, pin, classId, numberofQuestions, viewPoint, viewAnswer,
                 attemptsAllowed, maxPoints, typeofPoint, maxTimes, tracking, shuffle, status, startTime, endTime } = req.body
 
             if (!username) return res.status(400).json({ message: "Không có người dùng" })
             const user = await User.findOne({ username })
 
             if (!user) return res.status(400).json({ message: "Không có người dùng" })
+
+            const test = await Test.findOne({ _id: mongoose.Types.ObjectId(testId), teacher: user.id })
+
+            if (!test) return res.status(400).json({ message: "Thông tin không hợp lệ(không tìm thấy thông tin bài thi hoặc người tạo bài thi" })
 
             const course = await Class.findOne({ _id: mongoose.Types.ObjectId(classId), teacher: user.id })
             if (!course) return res.status(400).json({ message: "Thông tin không hợp lệ(không tìm thấy thông tin khóa học hoặc người tạo khóa học" })
@@ -161,7 +164,6 @@ const TestController = {
                 name,
                 description,
                 pin,
-                teacher: user.id,
                 numberofQuestions,
                 viewPoint,
                 viewAnswer,
@@ -180,11 +182,8 @@ const TestController = {
             //course.tests.push(test.id);
             //await course.save()
 
-            exitTest = await Test.findByIdAndUpdate(id, data, { new: true })
-            return res.status(200).json({
-                message: "Tạo bài thi mới thành công",
-                slug: exitTest._doc.slug
-            })
+            let exitTest = await Test.findByIdAndUpdate(testId, data, { new: true })
+            return res.status(200).json(exitTest)
 
         } catch (error) {
             console.log(error)
@@ -195,27 +194,45 @@ const TestController = {
     DeleteTest: async (req, res) => {
         try {
             const username = req.user?.sub
-            const { id } = req.body
+            const { testId } = req.query
 
             if (!username) return res.status(400).json({ message: "Không có người dùng" })
             const user = await User.findOne({ username })
 
             if (!user) return res.status(400).json({ message: "Không có người dùng" })
-            let exitsTest = await Test.findById(id)
+            let exitsTest = await Test.findById(testId)
 
-            exitsTest = await Test.deleteOne(id)
-            await TakeTest.deleteMany({ testId: id })
-            return res.status(200).json({
-                message: "Xuất bản bài thi thành công",
-
-                slug: exitsTest._doc.slug
-            })
+            await Test.findByIdAndDelete(testId)
+            await TakeTest.deleteMany({ testId: testId })
+            return res.status(200).json({ message: "Xóa bài thi thành công" })
 
         } catch (error) {
             console.log(error)
             res.status(400).json({ message: "Lỗi xuất bản bài thi" })
         }
     },
+    //GET ALL TEST
+    GetAllTests: async (req, res) => {
+        try {
+            const username = req.user?.sub
+            if (!username) return res.status(400).json({ message: "Không có người dùng" })
+            const user = await User.findOne({ username })
+            if (!user) return res.status(400).json({ message: "Không có người dùng" })
+
+            let tests = await Test.find({ teacher: user.id })
+                .populate({
+                    path: 'questions.question',
+                    populate: {
+                        path: 'answers'
+                    }
+                })
+            return res.status(200).json(tests)
+
+        } catch (error) {
+            console.log(error)
+            res.status(400).json({ message: "Lỗi tạo bài thi" })
+        }
+    }
 
 };
 

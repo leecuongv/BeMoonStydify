@@ -11,6 +11,15 @@ const CommentSchema = new Schema({
     content: {
         type: String
     },
-});
+},
+    {
+        timestamps: true,
+        toObject: {
+            transform: function (doc, ret) {
+                ret.id = ret._id
+                //delete ret._id;
+            }
+        }
+    });
 
 module.exports = mongoose.model(COLLECTION.COMMENT, CommentSchema);
