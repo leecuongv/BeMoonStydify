@@ -10,12 +10,16 @@ router.post('/add', verifyToken, NewFeedController.AddNewFeed);
 router.get('/', verifyToken, NewFeedController.GetAllNewFeeds);
 
 // GET NEWFEED BY ID
-router.get('/:id', verifyToken, NewFeedController.GetNewFeedById);
+router.get('/', verifyToken, NewFeedController.GetNewFeedById);
 
 // UPDATE NEWFEED BY ID
-router.put('/:id', verifyToken, NewFeedController.UpdateNewFeedById);
+router.put('/', verifyToken, NewFeedController.UpdateNewFeed);
 
 // DELETE NEWFEED BY ID
-router.delete('/:id', verifyToken, NewFeedController.DeleteNewFeedById);
+router.delete('/', verifyToken, NewFeedController.DeleteNewFeedById);
+
+router.delete("/remove-comment-by-teacher", verifyToken, NewFeedController.RemoveCommentByTeacher)
+
+router.delete("/remove-newfeed-by-teacher", verifyToken, NewFeedController.RemoveNewFeedByTeacher)
 
 module.exports = router;
