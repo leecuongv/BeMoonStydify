@@ -11,19 +11,18 @@ const {
   TestRoutes,
   QuestionRoutes,
   TakeTestRoutes,
-  QuestionBankRoutes,
   UploadRoutes,
   AdminRoutes,
   ClassRoutes,
   NewFeedRoutes,
   CommentRoutes
 } = require('./routers');
-
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const { notFound, errorHandler } = require("./routers/errorMiddleware");
 const helmet = require("helmet");
-//const passport = require('passport');
+const passport = require('passport');
 const rateLimit = require('express-rate-limit');
-//const session = require('express-session');
+const session = require('express-session');
 const morgan = require('morgan');
 const fileupload = require("express-fileupload");
 const NewFeed = require('./models/NewFeed');
@@ -33,7 +32,7 @@ const Class = require('./models/Class');
 dotenv.config()
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 const URI = process.env.MONGODB_URI;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }))//Giới hạn kích thước request gửi lên server phải nhỏ hơn 3mb
@@ -50,12 +49,12 @@ const loginLimiter = rateLimit({
   max: 3
 });
 
-// app.use(session({
-//   secret: 'somethingsecretgoeshere',
-//   resave: false,
-//   saveUninitialized: true,
-//   cookie: { secure: true },
-// }));
+app.use(session({
+  secret: 'somethingsecretgoeshere',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true },
+}));
 
 //app.use("/auth/login", loginLimiter);
 
@@ -83,7 +82,7 @@ app.use(helmet.contentSecurityPolicy({
     frameAncestors: ["'self'"],  // helps prevent Clickjacking attacks
     styleSrc: ["'self' https://maxcdn.bootstrapcdn.com"],
     fontSrc: ["'self' https://maxcdn.bootstrapcdn.com"],
-    formAction: ["'self' http://localhost:5000 https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"],
+    formAction: ["'self' http://localhost:3000 https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"],
     objectSrc: ["'none'"]
   }
 }))
@@ -117,8 +116,22 @@ app.get('/', (req, res) => {
 });
 
 
-// app.use(passport.initialize());
-// app.use(passport.session());
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new GoogleStrategy({
+  clientID: process.env.googleClientID,
+  clientSecret: process.env.googleClientSecret,
+  callbackURL: '/auth/google/callback',
+
+}, (accessToken, refreshToken, profile, done) => {
+  // Xử lý thông tin profile, có thể lưu vào cơ sở dữ liệu hoặc session
+  // Ví dụ: lưu thông tin vào session
+  console.log("TEST" + accessToken)
+  req.session.profile = profile;
+  return done(null, profile);
+}));
+
 app.use(morgan('combined'))
 app.use('/api/auth', AuthRoute)
 app.use('/api/user', UserRoute)
