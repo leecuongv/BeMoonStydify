@@ -17,7 +17,7 @@ const {
   NewFeedRoutes,
   CommentRoutes
 } = require('./routers');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
+//const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const { notFound, errorHandler } = require("./routers/errorMiddleware");
 const helmet = require("helmet");
 const passport = require('passport');
@@ -25,8 +25,6 @@ const rateLimit = require('express-rate-limit');
 const session = require('express-session');
 const morgan = require('morgan');
 const fileupload = require("express-fileupload");
-const NewFeed = require('./models/NewFeed');
-const Class = require('./models/Class');
 
 
 dotenv.config()
@@ -116,21 +114,21 @@ app.get('/', (req, res) => {
 });
 
 
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
-passport.use(new GoogleStrategy({
-  clientID: process.env.googleClientID,
-  clientSecret: process.env.googleClientSecret,
-  callbackURL: '/auth/google/callback',
+// passport.use(new GoogleStrategy({
+//   clientID: process.env.googleClientID,
+//   clientSecret: process.env.googleClientSecret,
+//   callbackURL: '/auth/google/callback',
 
-}, (accessToken, refreshToken, profile, done) => {
-  // Xử lý thông tin profile, có thể lưu vào cơ sở dữ liệu hoặc session
-  // Ví dụ: lưu thông tin vào session
-  console.log("TEST" + accessToken)
-  req.session.profile = profile;
-  return done(null, profile);
-}));
+// }, (accessToken, refreshToken, profile, done) => {
+//   // Xử lý thông tin profile, có thể lưu vào cơ sở dữ liệu hoặc session
+//   // Ví dụ: lưu thông tin vào session
+//   console.log("TEST" + accessToken)
+//   req.session.profile = profile;
+//   return done(null, profile);
+// }));
 
 app.use(morgan('combined'))
 app.use('/api/auth', AuthRoute)
