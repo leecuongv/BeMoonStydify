@@ -32,7 +32,7 @@ const Class = require('./models/Class');
 dotenv.config()
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 const URI = process.env.MONGODB_URI;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }))//Giới hạn kích thước request gửi lên server phải nhỏ hơn 3mb
@@ -82,7 +82,7 @@ app.use(helmet.contentSecurityPolicy({
     frameAncestors: ["'self'"],  // helps prevent Clickjacking attacks
     styleSrc: ["'self' https://maxcdn.bootstrapcdn.com"],
     fontSrc: ["'self' https://maxcdn.bootstrapcdn.com"],
-    formAction: ["'self' http://localhost:3000 https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"],
+    formAction: ["'self' http://localhost:5000 https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"],
     objectSrc: ["'none'"]
   }
 }))
