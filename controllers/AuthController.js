@@ -349,6 +349,16 @@ const AuthController = {
             console.log(error)
             return res.status(500).json({ message: "Lỗi", valid: false })
         }
+    },
+    //LOG OUT
+    Logout: async (req, res) => {
+        try {
+            res.clearCookie("token");
+            return res.status(200).json({ message: "Đăng xuất thành công" })
+        } catch (error) {
+            console.log(error)
+            return res.status(500).json({ message: "Lỗi đăng xuất" })
+        }
     }
 
 }

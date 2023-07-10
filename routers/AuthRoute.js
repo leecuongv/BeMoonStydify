@@ -30,6 +30,9 @@ router.post('/checkusername', AuthController.checkUsername);
 
 router.post('/checkemail', AuthController.checkEmail);
 
+//LOG OUT
+router.post('/logout', verifyToken, AuthController.Logout);
+
 router.get('/google', passport.authenticate('google', {
   scope: ['profile', 'email']
 }));
