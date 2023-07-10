@@ -195,7 +195,7 @@ const UserController = {
     },
     getUserById: async (req, res) => {
         try {
-            const id = req.query;
+            const { id } = req.query;
             const user = await User.findById(id);
             if (user) {
                 const { password, type, id, status, ...rest } = user._doc;

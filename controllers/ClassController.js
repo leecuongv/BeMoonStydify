@@ -12,7 +12,7 @@ const ClassController = {
                 return res.status(400).json({ message: "Không có người dùng!" })
             let loginUserId = loginUser.id
 
-            let joinedClass = await Class.find({}).populate("teacher").populate(
+            let joinedClass = await Class.find().populate("teacher").populate(
                 {
                     path: 'newFeeds.newFeed',
                     populate: {
@@ -21,6 +21,22 @@ const ClassController = {
                     }
                 }
             )
+            joinedClass = joinedClass.map(item => {
+                isJoined = false
+                isTeacher = false
+                if (item.students.find(item => item.toString() === loginUserId.toString())) {
+                    isJoined = true
+                }
+
+                if (item.teacher.id.toString() === loginUserId.toString()) {
+                    isTeacher = true
+                }
+                return {
+                    class: item,
+                    isJoined,
+                    isTeacher
+                }
+            })
 
             return res.status(200).json(
                 joinedClass
@@ -137,6 +153,17 @@ const ClassController = {
             if (!joinedClass) {
                 return res.status(400).json({ message: "Không tìm thấy lớp học!" })
             }
+
+            let isJoined = false
+            let isTeacher = false
+            if (joinedClass.students.find(item => item.toString() === loginUser.id.toString())) {
+                isJoined = true
+            }
+
+            if (joinedClass.teacher.id.toString() === loginUser.id.toString()) {
+                isTeacher = true
+            }
+            joinedClass = { ...joinedClass._doc, isJoined, isTeacher }
 
             return res.status(200).json(
                 joinedClass
