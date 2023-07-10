@@ -138,13 +138,13 @@ const CommentController = {
         try {
 
             const username = req.user?.sub
-            const { commentId } = req.query
+            const { id } = req.query
 
             const user = await User.findOne({ username })
             if (!user) {
                 return res.status(400).json({ message: "Tài khoản không tồn tại!" })
             }
-            const existComment = await Comment.findOne({ _id: mongoose.Types.ObjectId(commentId), creator: user.id })
+            const existComment = await Comment.findOne({ _id: mongoose.Types.ObjectId(id), creator: user.id })
             if (!existComment)
                 return res.status(400).json({ message: "Bình luận không tồn tại!" })
             const newFeed = await NewFeed.findOne({ comments: { $in: [existComment.id] } })

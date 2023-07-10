@@ -195,7 +195,7 @@ const AuthController = {
 
     ForgotPassword: async (req, res) => {
         try {
-            const email = req.query.email;
+            const { email } = req.query;
             if (email) {
                 const user = await User.findOne({ email: email })
                 if (user) {

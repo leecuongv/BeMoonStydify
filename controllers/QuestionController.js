@@ -20,7 +20,7 @@ const QuestionController = {
             const { testId, type, content, maxPoints, answers, image } = req.body
             if (!username) return res.status(400).json({ message: "Không có người dùng!" })
             const user = await User.findOne({ username })
-            const test = await Test.findOne({ _id: mongoose.Types.ObjectId(testId), creatorId: user._id })
+            const test = await Test.findOne({ _id: mongoose.Types.ObjectId(testId), creator: user._id })
             if (!test) return res.status(400).json({ message: "Không tồn tại!" })
             if (!user) return res.status(400).json({ message: "Không có người dùng!" })
 
@@ -74,7 +74,7 @@ const QuestionController = {
             //if (!username) return res.status(400).json({ message: "Không có người dùng!" })
             const user = await User.findOne({ username })
             if (!user) return res.status(400).json({ message: "Không có người dùng!" })
-            const test = await Test.findOne({ _id: mongoose.Types.ObjectId(testId), creatorId: user._id })
+            const test = await Test.findOne({ _id: mongoose.Types.ObjectId(testId), creator: user._id })
             if (!test) return res.status(400).json({ message: "Không tồn tại!" })
             if (test.status === STATUS.PUBLIC) return res.status(400).json({ message: "Không thể xóa câu hỏi trong bài thi đã được phát hành!" })
             const question = await Question.findOne({ _id: mongoose.Types.ObjectId(questionId) })

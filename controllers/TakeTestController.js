@@ -501,10 +501,10 @@ const TakeTestController = {
       const user = await User.findOne({ username })
 
       if (!user) return res.status(400).json({ message: "Không có người dùng" })
-      let creatorId = user.id
+      let creator = user.id
       const existTest = await Test.findOne({
         id: mongoose.Types.ObjectId(id),
-        creatorId
+        creator
       })
 
       if (!existTest) {
@@ -574,16 +574,16 @@ const TakeTestController = {
   ViewTestScoreDistribution: async (req, res) => {
     try {
       const username = req.user?.sub
-      const { slug } = req.query
+      const { id } = req.query
 
       if (!username) return res.status(400).json({ message: "Không có người dùng" })
       const user = await User.findOne({ username })
 
       if (!user) return res.status(400).json({ message: "Không có người dùng" })
-      let creatorId = user.id
+      let creator = user.id
       const test = await Test.findOne({
-        slug,
-        creatorId
+        id: mongoose.Types.ObjectId(id),
+        creator
       })
 
       if (!test) {

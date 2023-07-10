@@ -23,12 +23,12 @@ const QuestionBankController = {
             const user = await User.findOne({ username })
             if (!user) return res.status(400).json({ message: "Không có người dùng" })
 
-            const existQuestionBank = await QuestionBank.findOne({ name: name, creatorId: user._id })
+            const existQuestionBank = await QuestionBank.findOne({ name: name, creator: user._id })
             if (existQuestionBank) return res.status(400).json({ message: "Trùng tên với ngân hàng câu hỏi trước đó" })
             const newQuestionBank = new QuestionBank({
                 name,
                 description,
-                creatorId: user.id,
+                creator: user.id,
                 questions: []
             });
             let error = newQuestionBank.validateSync();
@@ -73,7 +73,7 @@ const QuestionBankController = {
             const user = await User.findOne({ username })
             if (!user) return res.status(400).json({ message: "Không có tài khoản" })
 
-            const questionBanks = await QuestionBank.find({ creatorId: user.id })
+            const questionBanks = await QuestionBank.find({ creator: user.id })
 
             if (questionBanks) {
                 return res.status(200).json(questionBanks)
@@ -169,7 +169,7 @@ const QuestionBankController = {
             const user = await User.findOne({ username })
             if (!user) return res.status(400).json({ message: "Không có người dùng!" })
 
-            let questionBank = await QuestionBank.findOne({ _id: new mongoose.Types.ObjectId(questionBankId), creatorId: user.id })
+            let questionBank = await QuestionBank.findOne({ _id: new mongoose.Types.ObjectId(questionBankId), creator: user.id })
             if (!questionBank)
                 return res.status(400).json({
                     message: "Không tìm thấy ngân hàng câu hỏi",
@@ -222,7 +222,7 @@ const QuestionBankController = {
             const user = await User.findOne({ username })
             if (!user) return res.status(400).json({ message: "Không có người dùng!" })
 
-            let questionBank = await QuestionBank.findOne({ _id: new mongoose.Types.ObjectId(questionBankId), creatorId: user.id })
+            let questionBank = await QuestionBank.findOne({ _id: new mongoose.Types.ObjectId(questionBankId), creator: user.id })
             if (!questionBank)
                 return res.status(400).json({
                     message: "Không tìm thấy ngân hàng câu hỏi",
@@ -283,7 +283,7 @@ const QuestionBankController = {
             }
             const user = await User.findOne({ username })
 
-            let questionBank = await QuestionBank.findOne({ _id: new mongoose.Types.ObjectId(questionBankId), creatorId: user.id })
+            let questionBank = await QuestionBank.findOne({ _id: new mongoose.Types.ObjectId(questionBankId), creator: user.id })
             if (!questionBank)
                 return res.status(400).json({
                     message: "Không tìm thấy ngân hàng câu hỏi!",
@@ -314,7 +314,7 @@ const QuestionBankController = {
             const newQuestionBank = await new QuestionBank({
                 name,
                 description,
-                creatorId: userId
+                creator: userId
             });
             const questionBank = await newQuestionBank.save();
 

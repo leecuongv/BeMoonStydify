@@ -49,14 +49,14 @@ const AdminController = {
     deleteUserById: async (req, res) => {
         try {
 
-            const userId = req.query.id;
-            const user = await User.findById(userId)
+            const { id } = req.query;
+            const user = await User.findById(id)
             if (!user)
                 return res.status(400).json({
                     message: "Không tìn thấy người dùng!"
                 })
             let name = user.fullname
-            let deleteUser = User.findByIdAndDelete(userId)
+            let deleteUser = User.findByIdAndDelete(id)
             if (deleteUser)
                 return res.status(200).json({
                     message: "Xóa người dùng " + name + " thành công!"

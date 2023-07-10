@@ -245,7 +245,6 @@ const ClassController = {
             const loginUser = await User.findOne({ username })
             if (!loginUser)
                 return res.status(400).json({ message: "Không có người dùng!" })
-            let loginUserId = loginUser.id
             const {
                 classCode,
                 description,
@@ -284,12 +283,11 @@ const ClassController = {
             const loginUser = await User.findOne({ username })
             if (!loginUser)
                 return res.status(400).json({ message: "Không có người dùng!" })
-            let loginUserId = loginUser.id
             const {
-                classId
+                id
             } = req.query
 
-            const existClass = await Class.findOne({ _id: mongoose.Types.ObjectId(classId), teacher: loginUser.id })
+            const existClass = await Class.findOne({ _id: mongoose.Types.ObjectId(id), teacher: loginUser.id })
             if (!existClass)
                 return res.status(400).json({ message: "Không tìm thấy lớp học!" })
 
@@ -310,12 +308,11 @@ const ClassController = {
         try {
             const username = req.user?.sub
             const loginUser = await User.findOne({ username })
-            const { classId } = req.body
+            const { id } = req.query
             if (!loginUser)
                 return res.status(400).json({ message: "Không có người dùng!" })
-            let loginUserId = loginUser.id
 
-            let joinedClass = await Class.findById(classId)
+            let joinedClass = await Class.findById(id)
                 .populate("teacher")
                 .populate('students')
             if (!joinedClass) {
