@@ -17,4 +17,6 @@ router.delete('/', verifyTokenAdmin, UserController.deleteAccount)
 
 router.get("/", verifyToken, UserController.searchUsers)
 
+router.get("/by-id", verifyToken, UserController.getUserById)
+
 module.exports = router;

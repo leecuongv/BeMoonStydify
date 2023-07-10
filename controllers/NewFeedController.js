@@ -34,9 +34,9 @@ const NewFeedController = {
             const loginUser = await User.findOne({ username })
             if (!loginUser)
                 return res.status(400).json({ message: "Không có người dùng!" })
-            const { newFeedId } = req.query
+            const { id } = req.query
 
-            const newNewFeed = await NewFeed.findById(newFeedId)
+            const newNewFeed = await NewFeed.findById(id)
             if (!newNewFeed) {
                 return res.status(400).json({ message: "Không tìm thấy bài đăng!" })
             }
@@ -126,14 +126,14 @@ const NewFeedController = {
     DeleteNewFeedById: async (req, res) => {
         try {
             const username = req.user?.sub
-            const { newFeedId } = req.query
+            const { id } = req.query
             const teacher = await User.findOne({ username })
 
             if (!teacher) {
                 return res.status(400).json({ message: "Tài khoản không tồn tại" })
             }
 
-            let newFeed = await NewFeed.findOne({ _id: new mongoose.Types.ObjectId(newFeedId), creator: teacher.id })
+            let newFeed = await NewFeed.findOne({ _id: new mongoose.Types.ObjectId(id), creator: teacher.id })
             if (!newFeed)
                 return res.status(400).json({
                     message: "Không tìm thấy khoá học",
@@ -159,14 +159,14 @@ const NewFeedController = {
     RemoveNewFeedByTeacher: async (req, res) => {
         try {
             const username = req.user?.sub
-            const { newFeedId } = req.query
+            const { id } = req.query
             const teacher = await User.findOne({ username })
 
             if (!teacher) {
                 return res.status(400).json({ message: "Tài khoản không tồn tại" })
             }
 
-            let newFeed = await NewFeed.findOne({ _id: new mongoose.Types.ObjectId(newFeedId) })
+            let newFeed = await NewFeed.findOne({ _id: new mongoose.Types.ObjectId(id) })
             if (!newFeed)
                 return res.status(400).json({
                     message: "Không tìm thấy bài đăng",
@@ -197,14 +197,14 @@ const NewFeedController = {
     RemoveCommentByTeacher: async (req, res) => {
         try {
             const username = req.user?.sub
-            const { commentId } = req.query
+            const { id } = req.query
             const teacher = await User.findOne({ username })
 
             if (!teacher) {
                 return res.status(400).json({ message: "Tài khoản không tồn tại" })
             }
 
-            let comment = await Comment.findOne({ _id: new mongoose.Types.ObjectId(commentId) })
+            let comment = await Comment.findOne({ _id: new mongoose.Types.ObjectId(id) })
             if (!comment)
                 return res.status(400).json({
                     message: "Không tìm thấy bài đăng",

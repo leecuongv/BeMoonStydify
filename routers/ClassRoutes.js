@@ -13,8 +13,7 @@ router.get('/all-member', verifyToken, ClassController.GetAllMember);
 router.get('/by-user-id', verifyToken, ClassController.GetClassByUserId);
 router.post("/join", verifyToken, ClassController.JoinClass)
 router.post("/leave", verifyToken, ClassController.LeaveClass)
-
-router.get('/', verifyToken, ClassController.GetClassById);
+router.get("/by-id", verifyToken, ClassController.GetClassById)
 
 router.get('/teacher', verifyToken, ClassController.GetClassByTeacherId);
 

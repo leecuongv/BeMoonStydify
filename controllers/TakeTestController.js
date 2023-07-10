@@ -323,16 +323,16 @@ const TakeTestController = {
   GetResultTakeTest: async (req, res) => {
 
     try {
-      const { takeTestId } = req.query;
+      const { id } = req.query;
       const username = req.user?.sub;
 
       const user = await User.findOne({ username });
       if (!user) return res.status(400).json({ message: "Không có người dùng" });
 
-      const takeTest = await TakeTest.findById(takeTestId).populate('testId')
+      const takeTest = await TakeTest.findById(id).populate('testId')
       const takeTests = await TakeTest.find({ testId: takeTest.testId.id, userId: user.id })
 
-      const index = takeTests.findIndex(item => item.id.toString() === takeTestId)
+      const index = takeTests.findIndex(item => item.id.toString() === id)
       if (!takeTest) return res.status(400).json({ message: "Không có lịch sử làm bài!" })
       if (takeTest.testId.viewPoint === 'no')
         return res.status(200).json({
@@ -360,12 +360,12 @@ const TakeTestController = {
 
   GetPreviewTest: async (req, res) => {
     try {
-      const { takeTestId } = req.query;
+      const { id } = req.query;
       const username = req.user?.sub;
       const user = await User.findOne({ username });
       if (!user) return res.status(400).json({ message: "Không có người dùng!" });
 
-      const takeTest = await TakeTest.findById(takeTestId)
+      const takeTest = await TakeTest.findById(id)
 
       const test = await Test.findById(takeTest.testId)
         .populate({
@@ -459,13 +459,13 @@ const TakeTestController = {
 
   GetLogs: async (req, res) => {
     try {
-      const { takeTestId } = req.query;
+      const { id } = req.query;
       const username = req.user?.sub;
 
       const user = await User.findOne({ username });
       if (!user) return res.status(400).json({ message: "Không có người dùng" });
 
-      const testLogs = await TestLog.findOne({ takeTestId: mongoose.Types.ObjectId(takeTestId) })
+      const testLogs = await TestLog.findOne({ takeTestId: mongoose.Types.ObjectId(id) })
       if (!testLogs) return res.status(400).json({ message: "Không có lịch sử làm bài!" })
 
       return res.status(200).json(testLogs)
@@ -495,7 +495,7 @@ const TakeTestController = {
   ViewAccuracyRateOfTestQuestions: async (req, res) => {
     try {
       const username = req.user?.sub
-      const { slug } = req.query
+      const { id } = req.query
 
       if (!username) return res.status(400).json({ message: "Không có người dùng" })
       const user = await User.findOne({ username })
@@ -503,21 +503,14 @@ const TakeTestController = {
       if (!user) return res.status(400).json({ message: "Không có người dùng" })
       let creatorId = user.id
       const existTest = await Test.findOne({
-        slug,
+        id: mongoose.Types.ObjectId(id),
         creatorId
       })
 
       if (!existTest) {
         return res.status(400).json({ message: "Không tồn tại bài thi!" })
-        console.log(existTest)
+
       }
-
-      // let testResult = await TakeTest.aggregate([
-      //     {
-      //         $match: { testId: { $in: [mongoose.Types.ObjectId(id)] } }
-      //     },
-
-      // ])
 
       let testResult = await TakeTest.find({ testId: mongoose.Types.ObjectId(existTest.id) }).populate({
         path: "result.question",

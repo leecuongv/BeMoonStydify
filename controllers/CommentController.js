@@ -31,12 +31,12 @@ const CommentController = {
     GetCommentById: async (req, res) => {
         try {
             const username = req.user?.sub
-            const { commentId } = req.query
+            const { id } = req.query
             const user = await User.findOne({ username })
             if (!user) {
                 return res.status(400).json({ message: "Tài khoản không tồn tại!" })
             }
-            const comment = await Comment.findOne({ _id: mongoose.Types.ObjectId(commentId), creator: user.id })
+            const comment = await Comment.findOne({ _id: mongoose.Types.ObjectId(id), creator: user.id })
             if (!comment)
                 return res.status(400).json({ message: "Không tồn tại bình luận!" })
 

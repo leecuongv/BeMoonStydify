@@ -131,9 +131,12 @@ const ClassController = {
             const loginUser = await User.findOne({ username })
             if (!loginUser)
                 return res.status(400).json({ message: "Không có người dùng!" })
-            let loginUserId = loginUser.id
 
             let joinedClass = await Class.findById(id)
+
+            if (!joinedClass) {
+                return res.status(400).json({ message: "Không tìm thấy lớp học!" })
+            }
 
             return res.status(200).json(
                 joinedClass

@@ -80,9 +80,9 @@ const TestController = {
             if (!username) return res.status(400).json({ message: "Không có người dùng" })
             const user = await User.findOne({ username })
             if (!user) return res.status(400).json({ message: "Không có người dùng" })
-            const { testId } = req.query
+            const { id } = req.query
 
-            const test = await Test.findOne({ _id: mongoose.Types.ObjectId(testId), teacher: user.id })
+            const test = await Test.findOne({ _id: mongoose.Types.ObjectId(id), teacher: user.id })
                 .populate({
                     path: 'questions.question',
                     populate: {
@@ -108,9 +108,9 @@ const TestController = {
             if (!username) return res.status(400).json({ message: "Không có người dùng" })
             const user = await User.findOne({ username })
             if (!user) return res.status(400).json({ message: "Không có người dùng" })
-            const { testId } = req.query
+            const { id } = req.query
 
-            const test = await Test.findById(testId)
+            const test = await Test.findById(id)
                 .populate({
                     path: 'questions.question',
                     populate: {
@@ -194,16 +194,16 @@ const TestController = {
     DeleteTest: async (req, res) => {
         try {
             const username = req.user?.sub
-            const { testId } = req.query
+            const { id } = req.query
 
             if (!username) return res.status(400).json({ message: "Không có người dùng" })
             const user = await User.findOne({ username })
 
             if (!user) return res.status(400).json({ message: "Không có người dùng" })
-            let exitsTest = await Test.findById(testId)
+            let exitsTest = await Test.findById(id)
 
-            await Test.findByIdAndDelete(testId)
-            await TakeTest.deleteMany({ testId: testId })
+            await Test.findByIdAndDelete(id)
+            await TakeTest.deleteMany({ testId: id })
             return res.status(200).json({ message: "Xóa bài thi thành công" })
 
         } catch (error) {
