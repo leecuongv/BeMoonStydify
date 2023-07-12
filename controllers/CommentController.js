@@ -36,7 +36,7 @@ const CommentController = {
             if (!user) {
                 return res.status(400).json({ message: "Tài khoản không tồn tại!" })
             }
-            const comment = await Comment.findOne({ _id: mongoose.Types.ObjectId(id), creator: user.id })
+            const comment = await Comment.findById(id)
             if (!comment)
                 return res.status(400).json({ message: "Không tồn tại bình luận!" })
 
