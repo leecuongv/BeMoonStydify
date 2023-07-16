@@ -232,7 +232,34 @@ const TestController = {
             console.log(error)
             res.status(400).json({ message: "Lỗi tạo bài thi" })
         }
+    },
+    //Lấy danh sách các bài thi theo classId
+    GetTestsByClassId: async (req, res) => {
+        try {
+            const username = req.user?.sub
+            const { id } = req.query
+            if (!username) return res.status(400).json({ message: "Không có người dùng" })
+            const user = await User.findOne({ username })
+            if (!user) return res.status(400).json({ message: "Không có người dùng" })
+
+            let tests = await Class.findById(id).populate({
+                path: 'tests',
+                populate: {
+                    path: 'questions.question',
+                    populate: {
+                        path: 'answers'
+                    }
+                }
+            })
+
+            return res.status(200).json({ tests: tests.tests })
+
+        } catch (error) {
+            console.log(error)
+            res.status(400).json({ message: "Lỗi tạo bài thi" })
+        }
     }
+
 
 };
 

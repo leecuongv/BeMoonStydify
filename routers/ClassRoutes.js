@@ -22,4 +22,5 @@ router.put('/', verifyToken, ClassController.UpdateClassById);
 router.delete("/remove-student", verifyToken, ClassController.RemoveStudent)
 router.delete("/", verifyToken, ClassController.DeleteClassById)
 
+
 module.exports = router;

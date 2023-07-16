@@ -13,7 +13,7 @@ router.get('/all', verifyToken, TestController.GetAllTests);
 router.get('/by-teacher', verifyToken, TestController.GetTestByIdFromTeacher);
 
 router.get('/by-student', verifyToken, TestController.GetTestByIdFromStudent);
-
+router.get("/by-class-id", verifyToken, TestController.GetTestsByClassId)
 
 
 module.exports = router;
